@@ -5,7 +5,7 @@ description: Generate a personal weekly status brief by reading Linear project n
 
 # Weekly Brief
 
-Generate a personal weekly status report from Linear projects listed in `project-tracking.md`.
+Generate a personal bi-weekly (last 2 weeks) status report from Linear projects listed in `project-tracking.md` and related github repos (same folder).
 
 ## Workflow
 
@@ -18,8 +18,13 @@ Generate a personal weekly status report from Linear projects listed in `project
    - Blocked or at-risk issues (filter by `blocked` state or overdue)
    - Upcoming issues (planned / in backlog / scheduled)
 4. Read the latest status update for the linear project (even if it has been created more then a week ago)
-5. Get all the commits and PRs in the last week to verify what has been done and what is progressing for all the subfolders (repos). Check the commits related to the projects in the project-tracking.md 
-6. **Compile the brief** — Write the report using the template below and store it in a file named brief-[date of generation].md
+5. If there are milestones - collect information about the progress on the milestone (along the goal of the milestone and % of tickets completed if the milestone is not achieved yet)
+6. Get all the commits and PRs in the last week to verify what has been done and what is progressing for all the subfolders (repos). Check the commits related to the projects in the project-tracking.md 
+7. In the linear updates and git commits look for mentions of statsig and A/B tests that either got started, are progressing with some results or got ended for any reason - call them out explicitely in the report along with names of experiments (if available)
+8. **Compile the brief** — Write the report using the template below and store it in a file named brief-[date of generation].md
+
+TODO: I would like to be able to read statsig experiments as well
+TODO: I WOULD LIKE TO EXTEND IT WITH ABILITY FOR ME TO ASK FOLLOW-UP QUESTIONS ABOUT THE STATUS (and extend skill that way)
 
 ## Output Template
 
@@ -33,6 +38,10 @@ Main projects that were worked on. Projects that were not worked on. Summary of 
 > [One-sentence purpose/goal of the project from its description]
 > bring projects which are at risk first. Sort projects my amount of work done there (the projects that were not worked on last)
 **Status**: [e.g. On Track / At Risk / Off Track]
+The status should be in format "The project to do [here goal of the project] is [here health of the project] for the date [here is ETA of the project]. Currently we have delivered XX% of stories. The risks are [here any risks if highlighted]
+
+### Milestones progress
+- [Milestone title and number] - [Milestone description/goals]
 
 ### Done this week
 - [Issue title] — [issue identifier]
@@ -46,6 +55,8 @@ Main projects that were worked on. Projects that were not worked on. Summary of 
 - [Issue title] — [issue identifier]
 - ...
 
+### A/B tests running
+- [Name of the A/B test in statsig] - [details of treatment groups] - results for primary metrics (including the statistical significance)
 
 ## Action Items 
 - 
