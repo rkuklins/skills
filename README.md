@@ -8,9 +8,13 @@ These paths are typically available to Cursor (and similar tools) from `~/.curso
 
 | Skill | Description |
 |-------|-------------|
-| [weekly-brief](./weekly-brief/SKILL.md) | Builds a personal weekly status brief: reads Linear project names from `project-tracking.md`, pulls current project state via the Linear MCP, optionally cross-checks recent commits/PRs, and writes a dated markdown report (`brief-[date].md`). Use for weekly updates, status, or progress reviews. |
+| [architecture-survey](./architecture-survey/SKILL.md) | Multi-phase **repo and org architecture survey**: discover repos, read connective tissue (gateways, IaC, events), scan each service in a fixed order, cluster by domain, then synthesize diagrams and an overview. Uses `gh`, local clones, and file inspection. Trigger when mapping services, system structure, or “how is X built?” from code. |
 | [devils-advocate](./devils-advocate/SKILL.md) | Critical review of a proposal, plan, decision, or document: surfaces assumptions, steelmans counter-arguments, flags blind spots and biases, gives a verdict (SOLID / SHAKY / RED FLAG), and ends with mitigations. Trigger phrases include “devil’s advocate,” “stress test,” “what am I missing,” “before I send this,” and similar. |
+| [memorize](./memorize/SKILL.md) | **Durable memory** in `~/.memory.md` with wiki-style `[[topic]]` links: capture task history and notes, recall on demand (“remind me…”, “what did I save for…”), and pull detail from workspace files when the user points at them. |
+| [meeting-prep](./meeting-prep/SKILL.md) | **Meeting preparation** bundle: stakeholder context template, scenarios, output brief structure, and examples. The folder also contains the same material as separate files (`stakeholder-context.md`, `output-template.md`, `scenarios.md`, `examples.md`) for easier editing. Includes nested [meeting-sim](./meeting-prep/skills/meeting-sim/SKILL.md) for rehearsing (“simulate the meeting”, role-play attendees). |
 | [personal-context-builder](./personal-context-builder/SKILL.md) | Interview-driven workflow that produces a **personal context portfolio**—structured markdown files (from templates under `personal-context-builder/templates/`) describing how someone works and what matters to them, for reuse by other agents or tools. |
+| [tune-the-ticket](./tune-the-ticket/SKILL.md) | **Refine a ticket** from a Linear issue (read-only MCP) or pasted text: gap analysis (acceptance criteria, DoD, scope, dependencies), likely repos, edge cases; writes one new markdown file and **does not** update Linear. |
+| [weekly-brief](./weekly-brief/SKILL.md) | Builds a personal weekly status brief: reads Linear project names from `project-tracking.md`, pulls current project state via the Linear MCP, optionally cross-checks recent commits/PRs, and writes a dated markdown report (`brief-[date].md`). Use for weekly updates, status, or progress reviews. |
 
 ## External dependencies
 
@@ -18,20 +22,24 @@ Some skills assume MCP servers, CLIs, or files outside the skill folder. Enable 
 
 | Skill | External tools and inputs |
 |-------|---------------------------|
-| [weekly-brief](./weekly-brief/SKILL.md) | **Linear MCP** for projects, issues, and status (use **`mcp_auth`** when the host requires it). **`project-tracking.md`** at the workspace root lists project names. **Git** in sibling repos for recent commits/PRs; **GitHub** access if you use `gh` or remote history the same way. Statsig / A/B callouts in the brief are inferred from Linear and commit text; the skill’s TODO mentions a future **Statsig** read—no Statsig MCP today. |
-| [tune-the-ticket](./tune-the-ticket/SKILL.md) | **Linear MCP**, read-only (for example **`get_issue`**) when the user gives an issue id or URL; **`mcp_auth`** if reads fail. If the user pastes ticket text only, no Linear MCP is required. |
 | [architecture-survey](./architecture-survey/SKILL.md) | **GitHub CLI** (`gh`, authenticated to the org), **`python3`** for JSON filtering in the documented examples, and normal **git** / filesystem access to clone and inspect repos. |
-| [memorize](./memorize/SKILL.md) | Writes **`~/.memory.md`** in the user’s home directory; may read workspace paths the user names. No MCP. |
 | [devils-advocate](./devils-advocate/SKILL.md) | None—works on text or documents in the session. |
-| [personal-context-builder](./personal-context-builder/SKILL.md) | Templates under the skill folder; optional user-supplied samples (exports, transcripts). No MCP. |
+| [memorize](./memorize/SKILL.md) | Writes **`~/.memory.md`** in the user’s home directory; may read workspace paths the user names. No MCP. |
 | [meeting-prep](./meeting-prep/SKILL.md) | Optional maintainer-owned **stakeholder context** file (see the skill bundle). No MCP described in the skill. |
+| [personal-context-builder](./personal-context-builder/SKILL.md) | Templates under the skill folder; optional user-supplied samples (exports, transcripts). No MCP. |
+| [tune-the-ticket](./tune-the-ticket/SKILL.md) | **Linear MCP**, read-only (for example **`get_issue`**) when the user gives an issue id or URL; **`mcp_auth`** if reads fail. If the user pastes ticket text only, no Linear MCP is required. |
+| [weekly-brief](./weekly-brief/SKILL.md) | **Linear MCP** for projects, issues, and status (use **`mcp_auth`** when the host requires it). **`project-tracking.md`** at the workspace root lists project names. **Git** in sibling repos for recent commits/PRs; **GitHub** access if you use `gh` or remote history the same way. Statsig / A/B callouts in the brief are inferred from Linear and commit text; the skill’s TODO mentions a future **Statsig** read—no Statsig MCP today. |
 
 ## Layout
 
 ```
-weekly-brief/SKILL.md           — Linear-backed weekly report
+architecture-survey/SKILL.md    — Org/repo architecture methodology
 devils-advocate/SKILL.md        — Structured critique workflow
-personal-context-builder/       — Interview protocol + templates/
+memorize/SKILL.md               — ~/.memory.md wiki-style memory
+meeting-prep/                   — Prep templates + scenarios + nested meeting-sim/
+personal-context-builder/     — Interview protocol + templates/
+tune-the-ticket/SKILL.md        — Read-only Linear + refined ticket markdown
+weekly-brief/SKILL.md           — Linear-backed weekly report
 ```
 
 ## Deployment
@@ -102,4 +110,4 @@ node scripts/deploy-skills.mjs --common-only
 
 ## Usage
 
-Invoke a skill when the task matches its description; agents that support skills usually load them from this directory automatically. If your environment uses slash commands, the skill name in the YAML frontmatter (e.g. `weekly-brief`, `devils-advocate`, `context-builder` for personal-context-builder) is what those commands are keyed on—check your client’s docs for the exact syntax.
+Invoke a skill when the task matches its description; agents that support skills usually load them from this directory automatically. If your environment uses slash commands, the skill name in the YAML frontmatter is what those commands are keyed on—check your client’s docs for the exact syntax. Names in this repo: `weekly-brief`, `devils-advocate`, `context-builder` ([personal-context-builder](./personal-context-builder/SKILL.md)), `memorize`, `tune-the-ticket`, `repo-architecture-survey` ([architecture-survey](./architecture-survey/SKILL.md)), and nested `simulating-meeting` ([meeting-sim](./meeting-prep/skills/meeting-sim/SKILL.md)).
