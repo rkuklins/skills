@@ -20,6 +20,72 @@ devils-advocate/SKILL.md        — Structured critique workflow
 personal-context-builder/       — Interview protocol + templates/
 ```
 
+## Deployment
+
+Deploying copies every top-level folder that contains a `SKILL.md` into `~/.sync-skills/skills` and into the home skills folders for `claude`, `codex`, `cursor`, and `gemini`.
+
+Prerequisite: install Node.js with npm. The deploy script is dependency-free and does not require `sync-skills`.
+
+Target folders:
+
+```text
+~/.claude/skills
+~/.codex/skills
+~/.cursor/skills
+~/.gemini/skills
+~/.sync-skills/skills
+```
+
+### Windows
+
+From PowerShell:
+
+```powershell
+npm run deploy
+```
+
+Or run the script directly:
+
+```powershell
+node scripts/deploy-skills.mjs
+```
+
+### macOS and Linux
+
+Using npm:
+
+```bash
+npm run deploy
+```
+
+Using Make:
+
+```bash
+make deploy
+```
+
+### Dry Run
+
+Preview the deployment without writing files:
+
+```bash
+npm run deploy:dry-run
+```
+
+Make users can also run:
+
+```bash
+make deploy-dry-run
+```
+
+### Common Directory Only
+
+Copy only to `~/.sync-skills/skills` and skip assistant folders:
+
+```bash
+node scripts/deploy-skills.mjs --common-only
+```
+
 ## Usage
 
 Invoke a skill when the task matches its description; agents that support skills usually load them from this directory automatically. If your environment uses slash commands, the skill name in the YAML frontmatter (e.g. `weekly-brief`, `devils-advocate`, `context-builder` for personal-context-builder) is what those commands are keyed on—check your client’s docs for the exact syntax.

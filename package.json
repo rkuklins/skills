@@ -1,0 +1,8 @@
+{
+  "name": "skills",
+  "private": true,
+  "scripts": {
+    "deploy": "node scripts/deploy-skills.mjs",
+    "deploy:dry-run": "node scripts/deploy-skills.mjs --dry-run"
+  }
+}
