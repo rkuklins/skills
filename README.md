@@ -14,6 +14,7 @@ These paths are typically available to Cursor (and similar tools) from `~/.curso
 | [meeting-prep](./meeting-prep/SKILL.md) | **Meeting preparation** bundle: stakeholder context template, scenarios, output brief structure, and examples. The folder also contains the same material as separate files (`stakeholder-context.md`, `output-template.md`, `scenarios.md`, `examples.md`) for easier editing. Includes nested [meeting-sim](./meeting-prep/skills/meeting-sim/SKILL.md) for rehearsing (“simulate the meeting”, role-play attendees). |
 | [personal-context-builder](./personal-context-builder/SKILL.md) | Interview-driven workflow that produces a **personal context portfolio**—structured markdown files (from templates under `personal-context-builder/templates/`) describing how someone works and what matters to them, for reuse by other agents or tools. |
 | [tune-the-ticket](./tune-the-ticket/SKILL.md) | **Refine a ticket** from a Linear issue (read-only MCP) or pasted text: gap analysis (acceptance criteria, DoD, scope, dependencies), likely repos, edge cases; writes one new markdown file and **does not** update Linear. |
+| [team-report](./team-report/SKILL.md) | **Team activity report** for a time window: Linear issue counts per person and per project (with optional portfolio share and project blurbs from `get_project`), plus Git commit counts per person and per repo from local clones. Reads `team.md` (roster emails) and `project-tracking.md` (portfolio project names). Use for “what did the team ship,” portfolio vs assignees, or Linear plus commit summaries. Writes a dated markdown file at the repo root (for example `report-team-activity-YYYY-MM-DD.md`). |
 | [weekly-brief](./weekly-brief/SKILL.md) | Builds a personal weekly status brief: reads Linear project names from `project-tracking.md`, pulls current project state via the Linear MCP, optionally cross-checks recent commits/PRs, and writes a dated markdown report (`brief-[date].md`). Use for weekly updates, status, or progress reviews. |
 
 ## External dependencies
@@ -28,6 +29,7 @@ Some skills assume MCP servers, CLIs, or files outside the skill folder. Enable 
 | [meeting-prep](./meeting-prep/SKILL.md) | Optional maintainer-owned **stakeholder context** file (see the skill bundle). No MCP described in the skill. |
 | [personal-context-builder](./personal-context-builder/SKILL.md) | Templates under the skill folder; optional user-supplied samples (exports, transcripts). No MCP. |
 | [tune-the-ticket](./tune-the-ticket/SKILL.md) | **Linear MCP**, read-only (for example **`get_issue`**) when the user gives an issue id or URL; **`mcp_auth`** if reads fail. If the user pastes ticket text only, no Linear MCP is required. |
+| [team-report](./team-report/SKILL.md) | **Linear MCP** with **`list_issues`** (assignee filters, optional `team`, pagination via `cursor` / `limit`), and **`get_project`** for portfolio blurbs; read tool schemas under the workspace **`mcps`** folder before calling. **`team.md`** at the workspace root: one person per line, `Name; email@domain` (emails used for Linear assignee filters and Git author matching). **`project-tracking.md`** at the workspace root: one Linear project **title** per line (must match Linear for `get_project` / project columns). **Local `git` clones** under the workspace (or paths the user names); the skill prefers `git log` over the GitHub API unless the user asks otherwise. Optional **Linear team** name (for example `iOS`) when scoping `list_issues`. |
 | [weekly-brief](./weekly-brief/SKILL.md) | **Linear MCP** for projects, issues, and status (use **`mcp_auth`** when the host requires it). **`project-tracking.md`** at the workspace root lists project names. **Git** in sibling repos for recent commits/PRs; **GitHub** access if you use `gh` or remote history the same way. Statsig / A/B callouts in the brief are inferred from Linear and commit text; the skill’s TODO mentions a future **Statsig** read—no Statsig MCP today. |
 
 ## Layout
@@ -39,6 +41,7 @@ memorize/SKILL.md               — ~/.memory.md wiki-style memory
 meeting-prep/                   — Prep templates + scenarios + nested meeting-sim/
 personal-context-builder/     — Interview protocol + templates/
 tune-the-ticket/SKILL.md        — Read-only Linear + refined ticket markdown
+team-report/SKILL.md            — Linear + git team activity report
 weekly-brief/SKILL.md           — Linear-backed weekly report
 ```
 
@@ -110,4 +113,4 @@ node scripts/deploy-skills.mjs --common-only
 
 ## Usage
 
-Invoke a skill when the task matches its description; agents that support skills usually load them from this directory automatically. If your environment uses slash commands, the skill name in the YAML frontmatter is what those commands are keyed on—check your client’s docs for the exact syntax. Names in this repo: `weekly-brief`, `devils-advocate`, `context-builder` ([personal-context-builder](./personal-context-builder/SKILL.md)), `memorize`, `tune-the-ticket`, `repo-architecture-survey` ([architecture-survey](./architecture-survey/SKILL.md)), and nested `simulating-meeting` ([meeting-sim](./meeting-prep/skills/meeting-sim/SKILL.md)).
+Invoke a skill when the task matches its description; agents that support skills usually load them from this directory automatically. If your environment uses slash commands, the skill name in the YAML frontmatter is what those commands are keyed on—check your client’s docs for the exact syntax. Names in this repo: `weekly-brief`, `team-report`, `devils-advocate`, `context-builder` ([personal-context-builder](./personal-context-builder/SKILL.md)), `memorize`, `tune-the-ticket`, `repo-architecture-survey` ([architecture-survey](./architecture-survey/SKILL.md)), and nested `simulating-meeting` ([meeting-sim](./meeting-prep/skills/meeting-sim/SKILL.md)).
