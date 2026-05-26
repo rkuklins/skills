@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "deploy": "node scripts/deploy-skills.mjs",
-    "deploy:dry-run": "node scripts/deploy-skills.mjs --dry-run"
+    "deploy:dry-run": "node scripts/deploy-skills.mjs --dry-run",
+    "deploy:common-only": "node scripts/deploy-skills.mjs --common-only",
+    "list-skills": "make list-skills"
   }
 }
