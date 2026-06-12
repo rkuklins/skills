@@ -6,7 +6,7 @@ These paths are typically available to Cursor (and similar tools) from `~/.curso
 
 **Skill folders in this repo** (run `make list-skills` to print the current list):
 
-`address-review-comments`, `architecture-survey`, `devils-advocate`, `distro-agent-ticket`, `find-ticket-dependencies`, `implement-linear-ticket`, `meeting-prep`, `memorize`, `personal-context-builder`, `review-code`, `review-code-and-comment`, `team-report`, `tech-debt`, `tune-the-ticket`, `weekly-brief`
+`address-review-comments`, `architecture-survey`, `devils-advocate`, `distro-agent-ticket`, `find-ticket-dependencies`, `implement-linear-ticket`, `meeting-prep`, `memorize`, `personal-context-builder`, `prd-to-linear`, `review-code`, `review-code-and-comment`, `team-report`, `tech-debt`, `tune-the-ticket`, `weekly-brief`
 
 ## Skills
 
@@ -21,6 +21,7 @@ These paths are typically available to Cursor (and similar tools) from `~/.curso
 | [meeting-prep](./meeting-prep/SKILL.md) | _(see skill bundle)_ | **Meeting preparation** bundle: stakeholder context, scenarios, output brief structure, and examples. Includes embedded **meeting simulation** (`simulating-meeting`) for rehearsing ("simulate the meeting", role-play attendees). |
 | [memorize](./memorize/SKILL.md) | `memorize` | **Durable memory** in `~/.memory.md` with wiki-style `[[topic]]` links: capture task history and notes, recall on demand ("remind me…", "what did I save for…"), and pull detail from workspace files when the user points at them. |
 | [personal-context-builder](./personal-context-builder/SKILL.md) | `context-builder` | Interview-driven workflow that produces a **personal context portfolio**—structured markdown files (from templates under `personal-context-builder/templates/`) describing how someone works and what matters to them, for reuse by other agents or tools. |
+| [prd-to-linear](./prd-to-linear/SKILL.md) | `prd-to-linear` | Read a Linear Document PRD and convert it into **Linear milestones and implementation tickets**: extracts phases → milestones, features → epics, tasks → tickets; surfaces spec gaps one-at-a-time; consults the target repo for architecture context; creates milestones and fully-structured tickets in Linear with user confirmation. |
 | [review-code](./review-code/SKILL.md) | `review-code` | Review a GitHub PR and produce **structured findings**: two-pass review (general + checklist across 7 categories), cross-referenced against repo standards (AGENTS.md/CLAUDE.md), deduped, and formatted with verdict (APPROVE / COMMENT / REQUEST_CHANGES), severity counts, and per-finding category/file/line references. Output is local markdown — no GitHub writes. |
 | [review-code-and-comment](./review-code-and-comment/SKILL.md) | `review-code-and-comment` | Run `review-code` then **post all findings as a single GitHub PR review** with line-level inline comments and an executive summary body. Findings not mappable to diff lines go into the review body. Requires `review-code`. |
 | [tech-debt-assessor](./tech-debt/SKILL.md) | `tech-debt-assessor` | **Tech debt assessment**: scans local repos, architecture documents, and Linear projects listed in `tech-debt-config.md` (or `project-tracking.md` as fallback) to identify debt themes and writes a stakeholder-ready report using [tech-debt-report-template.md](./tech-debt/tech-debt-report-template.md). Copy [tech-debt-config-template.md](./tech-debt/tech-debt-config-template.md) to `tech-debt-config.md` per workspace. Trigger: tech debt assessment, debt report, debt backlog, architecture risk review. |
@@ -38,6 +39,7 @@ The full pipeline from ticket creation to merged code.
 
 | Skill | Role |
 |-------|------|
+| [prd-to-linear](./prd-to-linear/SKILL.md) | Convert a PRD document into milestones and a full implementation backlog |
 | [tune-the-ticket](./tune-the-ticket/SKILL.md) | Assess and refine a Linear issue before anyone picks it up |
 | [distro-agent-ticket](./distro-agent-ticket/SKILL.md) | Create or refine a ticket specifically for the distribution-agents automated workflow |
 | [find-ticket-dependencies](./find-ticket-dependencies/SKILL.md) | Detect and mark `blocks`/`relatedTo` relations across a filtered ticket set |
@@ -97,6 +99,7 @@ Some skills assume MCP servers, CLIs, or files outside the skill folder. Enable 
 | [meeting-prep](./meeting-prep/SKILL.md) | Optional maintainer-owned **stakeholder context** file (see the skill bundle). No MCP described in the skill. |
 | [memorize](./memorize/SKILL.md) | Writes **`~/.memory.md`** in the user's home directory; may read workspace paths the user names. No MCP. |
 | [personal-context-builder](./personal-context-builder/SKILL.md) | Templates under the skill folder; optional user-supplied samples (exports, transcripts). No MCP. |
+| [prd-to-linear](./prd-to-linear/SKILL.md) | **Linear MCP** (`list_projects`, `get_project`, `list_documents`, `get_document`, `list_milestones`, `list_teams`, `get_team`, `save_milestone`, `save_issue`). Optional **GitHub CLI** (`gh`) and **git / Read** for lightweight repo architecture survey. |
 | [review-code](./review-code/SKILL.md) | **GitHub CLI** (`gh`) for PR metadata and diff. **Linear MCP** (read-only) when a ticket identifier is found in the PR. Local repo checkout preferred; falls back to the GitHub API. No writes to GitHub. |
 | [review-code-and-comment](./review-code-and-comment/SKILL.md) | Everything `review-code` requires, plus the **GitHub Reviews API** (`gh api repos/{owner}/{repo}/pulls/{number}/reviews`) to post the review. **`review-code` skill** must be installed. |
 | [tech-debt-assessor](./tech-debt/SKILL.md) | **Linear MCP** (`get_project`, `list_issues` with pagination). **`tech-debt-config.md`** at the workspace root (from [tech-debt-config-template.md](./tech-debt/tech-debt-config-template.md)): **Linear project titles**, architecture doc paths, repo roots, labels, report period. Falls back to **`project-tracking.md`** if the config project list is empty. **Local git repos** under the workspace (or configured paths) for code/deps/CI signals. Writes `tech-debt-report-YYYY-MM-DD.md` at the workspace root. |
@@ -118,6 +121,10 @@ implement-linear-ticket/SKILL.md   — End-to-end ticket → implementation → 
 meeting-prep/SKILL.md              — Prep + embedded meeting-sim content
 memorize/SKILL.md                  — ~/.memory.md wiki-style memory
 personal-context-builder/          — Interview protocol + templates/
+prd-to-linear/
+  SKILL.md                         — PRD → milestones + Linear tickets workflow
+  references/prd-analysis-guide.md — Milestone/feature/gap extraction patterns
+  references/ticket-template.md    — Standard ticket body format
 review-code/
   SKILL.md                         — Two-pass structured PR review (local output)
   checklist.md                     — Review criteria by category
