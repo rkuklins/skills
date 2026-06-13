@@ -4,8 +4,10 @@ description: >-
   Read a PRD (Product Requirements Document) stored as a Linear Document and convert it into
   Linear milestones and fully-structured implementation tickets. Analyzes the document to identify
   development phases (mapped to Linear Milestones), features, and implementation tasks; surfaces
-  gaps in the spec through a collaborative one-question-at-a-time review; consults the target
-  repository for architecture context; and creates milestones and tickets in Linear.
+  inconsistencies (contradictions within the PRD) and gaps in the spec through a collaborative
+  one-question-at-a-time review; probes for high-level architectural guidance before writing
+  tickets; consults the target repository for architecture context; and creates milestones and
+  tickets in Linear.
   Use when the user says "break this PRD into tickets", "convert the spec to Linear issues",
   "create tickets from the PRD", "plan this feature from the document", "turn this doc into a
   backlog", or wants to transform a product specification into a structured Linear project backlog
@@ -23,9 +25,9 @@ description: >-
 
 ## Rules
 
-1. **One gap question per turn.** Never batch clarifying questions about PRD gaps. Each unresolved
-   requirement gets its own focused question. Stop when the user says "proceed" or all critical
-   gaps are resolved.
+1. **One question per turn.** Never batch clarifying questions about PRD inconsistencies, gaps, or
+   architectural guidance. Each unresolved item gets its own focused question. Stop when the user
+   says "proceed" or all critical items are resolved.
 2. **Confirm before writing to Linear.** Present the full proposed plan (milestones + ticket list)
    and wait for explicit approval before calling `save_milestone` or `save_issue`.
 3. **Every ticket needs an implementation approach.** Derive it from the repo survey when available;
@@ -60,11 +62,35 @@ Extract from the document:
   changes, UI screens, background jobs, integrations, config flags.
 - **Gaps** — vague requirements, missing acceptance criteria, untestable claims, unspecified edge
   cases, missing design/API/data model references, undefined error handling, unresolved dependencies.
+- **Inconsistencies** — pairs of contradictory statements: the same entity described differently
+  across sections, a constraint in one phase that conflicts with a requirement in another, a success
+  metric incompatible with a stated constraint, a non-functional requirement that contradicts a
+  functional one. See the Inconsistency Detection section of the analysis guide for the full
+  pattern table. Record each as `(section A, statement A)` vs `(section B, statement B)`.
 
-Produce an internal structured outline (milestones → features → tasks + gap list). Do not output it
-yet.
+Produce an internal structured outline (milestones → features → tasks + gap list + inconsistency
+list). Do not output it yet.
 
-### 3. Surface gaps (one at a time)
+### 3. Surface inconsistencies (one at a time)
+
+Before surfacing gaps, resolve any contradictions found in Step 2. For each inconsistency, ask one
+focused question per turn. Use this format:
+
+> **Inconsistency [n/total]:** [Section A title] vs [Section B title] — [Exact conflict] —
+> Which takes precedence, or should both be revised?
+
+Example: *"Inconsistency 1/2: Section 2 (User roles) vs Section 5 (Permissions model) — Section 2
+states each user has exactly one role, while Section 5 describes permissions that imply a user can
+hold multiple simultaneous roles. Which model is correct?"*
+
+Stop asking when:
+- All inconsistencies are resolved, or
+- The user says to proceed and flag remaining inconsistencies in tickets.
+
+Mark unresolved inconsistencies as `> ⚠️ INCONSISTENCY: [description of conflict]` in the
+description of every ticket that the conflicting requirements affect.
+
+### 4. Surface gaps (one at a time)
 
 For each gap, ask one focused question per turn. Use this format:
 
@@ -79,7 +105,7 @@ Stop asking when:
 
 Mark unresolved gaps as `> ⚠️ OPEN QUESTION: [question]` in the relevant ticket's description.
 
-### 4. Confirm milestone structure
+### 5. Confirm milestone structure
 
 Present the proposed milestones:
 
@@ -92,7 +118,9 @@ reordering?"*
 
 Wait for explicit confirmation before continuing. Map to existing milestones where possible.
 
-### 5. Architecture check (per milestone or feature cluster)
+### 6. Architecture and guidance check (per milestone or feature cluster)
+
+#### 6a. Repository survey (per milestone)
 
 For each milestone (or significant feature cluster):
 
@@ -108,7 +136,41 @@ For each milestone (or significant feature cluster):
 Batch the repo question for the next milestone immediately after the user answers the current one —
 but still ask one milestone at a time.
 
-### 6. Propose the full ticket breakdown
+#### 6b. Architectural guidance questions (project-scoped, asked once)
+
+After completing the repository survey for all milestones, probe for high-level architectural
+decisions that the PRD implies but does not specify. These answers apply to every ticket in Step 7
+and are stored as **Architectural context** used to populate the `Implementation approach` section.
+
+**Skip any category already answered by `AGENTS.md`, `CLAUDE.md`, or the PRD itself.** Ask one
+question per turn.
+
+Probe the following categories (in order), tailoring each question to what the PRD actually implies:
+
+1. **Communication style** — *"The PRD involves [feature]. Should the API surface use REST,
+   GraphQL, gRPC, or internal events / pub-sub? Is there an existing convention to follow?"*
+2. **Service boundaries** — *"Should this be built by extending existing services, or does it
+   warrant new service(s)? Are there ownership or team-boundary constraints?"*
+3. **Feature flag strategy** — *"Will any of these features need a rollout flag? If so, what
+   mechanism is in use (e.g. LaunchDarkly, custom config, env vars), and what is the flag lifecycle
+   policy (when should cleanup happen)?"*
+4. **Data ownership / tenancy** — *"Does the system need per-user isolation, multi-tenancy, or is
+   it single-tenant? Are there data residency or partitioning constraints?"*
+5. **Scale and performance targets** — *"Are there latency SLOs, throughput targets, or data-volume
+   constraints that should guide the implementation approach?"*
+6. **Auth and security patterns** — *"Which authentication and authorization mechanism applies
+   here? Any compliance or data-sensitivity constraints the tickets should reflect?"*
+7. **Observability conventions** — *"Are there logging formats, metric naming conventions, or
+   alerting thresholds the implementation should conform to?"*
+
+Stop when:
+- All relevant categories have been answered or confirmed as not applicable, or
+- The user says to proceed and notes that remaining categories are not applicable to this project.
+
+Record all answers as an **Architectural context** block and reference it in the `Implementation
+approach` of every ticket in Step 7.
+
+### 7. Propose the full ticket breakdown
 
 Read [references/ticket-template.md](references/ticket-template.md) for the ticket body format.
 
@@ -127,7 +189,7 @@ After presenting all milestones, ask:
 
 Wait for the user's answer.
 
-### 7. Create milestones and tickets
+### 8. Create milestones and tickets
 
 After explicit approval:
 
@@ -146,7 +208,7 @@ After explicit approval:
 
    Never create tickets the user explicitly skipped.
 
-### 8. Report
+### 9. Report
 
 Print a concise summary:
 

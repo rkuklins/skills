@@ -112,6 +112,26 @@ roles).
 
 ---
 
+## Inconsistency Detection
+
+An **inconsistency** is different from a gap: a gap is *missing* information, while an inconsistency is *contradictory* information — two or more statements in the document that cannot both be correct. Inconsistencies must be resolved before implementation begins; an engineer cannot safely choose which statement to follow without the author's guidance.
+
+| Pattern | Example |
+|---|---|
+| Same entity, different shape | Section 2 says a user has exactly one role; Section 5 implies a user can hold multiple simultaneous roles |
+| Constraint vs. requirement | "The system must work fully offline" (Section 3) vs. "requires real-time cloud sync" (Section 6) |
+| Phase precondition violated | Phase 2 depends on Feature A being complete, but Feature A is placed in Phase 3 |
+| Non-functional vs. functional conflict | "Zero-downtime deploys required" alongside "each deploy runs a blocking schema migration" with no migration strategy provided |
+| Success metric incompatibility | Metric A can only improve at the direct expense of Metric B — both stated as targets without acknowledging the trade-off |
+| Scope overlap | Two features described independently that would require owning the same data or API surface |
+| Audience contradiction | Section 1 describes the system as consumer-facing; a later section adds enterprise multi-tenancy requirements without reconciling the UX model |
+
+**Severity:** All inconsistencies default to **Critical** — unlike gaps, which have a severity spectrum. Two conflicting statements cannot both be implemented correctly, so resolution is always required before a ticket can be written.
+
+**Extraction rule:** For each inconsistency found, record it as a pair: `(section A, statement A)` vs `(section B, statement B)`, with a one-sentence description of the conflict. Store these in the inconsistency list separately from the gap list.
+
+---
+
 ## Severity of Gaps
 
 When deciding how hard to push on a gap before proceeding:
