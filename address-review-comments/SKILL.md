@@ -58,12 +58,20 @@ Wait for the user's response before proceeding.
 
 ### 5. Implement approved changes
 
-- For each comment where the agreed action is to make a code change, implement the change.
-- Make the changes carefully, following the coding and testing conventions described in AGENTS.md.
+For each comment where the agreed action is to make a code change:
+
+1. Implement the change for **that comment only**.
+2. Stage and commit the change immediately before moving to the next comment:
+   - `git add -A`
+   - `git commit -m "review: <short description of what was changed and why>"`
+   - Use a concise, imperative-mood commit message that references what the comment asked for (e.g. `review: extract helper to reduce duplication`).
+3. Repeat for every remaining comment that requires a change — one commit per comment.
+
+Make all changes carefully, following the coding and testing conventions described in AGENTS.md.
 
 ### 6. Push changes (if any were made)
 
-- If any code changes were made in step 5, execute the `push-code` skill.
+- If any commits were created in step 5, execute the `push-code` skill.
 
 ### 7. Reply to each comment on the PR
 
