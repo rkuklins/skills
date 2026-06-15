@@ -19,7 +19,7 @@ Look for these signals in the document:
 
 **When there are no explicit phases:** infer phases from feature dependency order and complexity. A
 minimal set is: *Foundation → Core Features → Polish / Launch*. Always ask the user to confirm
-inferred phases (Step 4).
+inferred phases (Step 5).
 
 **Mapping to existing milestones:** if the project already has milestones defined, match by name
 similarity and goal description before proposing new ones. Prefer reuse over creating duplicates.
@@ -62,7 +62,9 @@ Size guidance:
 
 ## Gap Detection
 
-A gap is any requirement that cannot be directly implemented from the PRD alone. Common gap types:
+A gap is **missing** information — a requirement that cannot be directly implemented from the PRD alone. Do not classify contradictory or conflicting statements as gaps; those are inconsistencies handled in [Inconsistency Detection](#inconsistency-detection) below.
+
+Common gap types:
 
 ### Vague requirements
 - "fast", "secure", "scalable", "easy to use" without measurable criteria
@@ -86,12 +88,6 @@ roles).
 
 **Fix:** Ask for the specific link or document.
 
-### Conflicting requirements
-- Two sections describe incompatible behaviors for the same feature
-- A constraint in one phase contradicts a requirement in another
-
-**Fix:** Surface both statements and ask which takes precedence.
-
 ### Untestable acceptance criteria
 - "The system should feel responsive"
 - "Users should be satisfied"
@@ -104,11 +100,7 @@ roles).
 
 **Fix:** Ask whether the dependency is ready or flag the ticket as blocked.
 
-### Prioritization ambiguity
-- Long feature lists with no clear must-have / nice-to-have distinction
-- All features described at equal priority
-
-**Fix:** Ask the user to rank or label features by release priority.
+**Boundary note:** If the dependency issue is that Feature A is *underspecified* (missing info), classify as a gap here. If the issue is that Feature A is *sequenced in the wrong phase* (e.g. placed after the feature that requires it), that is a contradictory ordering and must be classified as an inconsistency — see the "Phase precondition violated" pattern in [Inconsistency Detection](#inconsistency-detection).
 
 ---
 
