@@ -6,7 +6,7 @@ These paths are typically available to Cursor (and similar tools) from `~/.curso
 
 **Skill folders in this repo** (run `make list-skills` to print the current list):
 
-`address-review-comments`, `architecture-survey`, `devils-advocate`, `distro-agent-ticket`, `find-ticket-dependencies`, `implement-linear-ticket`, `meeting-prep`, `memorize`, `personal-context-builder`, `prd-to-linear`, `review-code`, `review-code-and-comment`, `team-report`, `tech-debt`, `tune-the-ticket`, `weekly-brief`
+`address-review-comments`, `architecture-survey`, `devils-advocate`, `distro-agent-ticket`, `eng-review`, `find-ticket-dependencies`, `implement-linear-ticket`, `meeting-prep`, `memorize`, `personal-context-builder`, `prd-to-linear`, `review-code`, `review-code-and-comment`, `team-report`, `tech-debt`, `tune-the-ticket`, `weekly-brief`
 
 ## Skills
 
@@ -16,6 +16,7 @@ These paths are typically available to Cursor (and similar tools) from `~/.curso
 | [architecture-survey](./architecture-survey/SKILL.md) | `repo-architecture-survey` | Multi-phase **repo and org architecture survey**: discover repos, read connective tissue (gateways, IaC, events), scan each service in a fixed order, cluster by domain, then synthesize diagrams and an overview. Uses `gh`, local clones, and file inspection. Trigger when mapping services, system structure, or "how is X built?" from code. |
 | [devils-advocate](./devils-advocate/SKILL.md) | `devils-advocate` | Critical review of a proposal, plan, decision, or document: surfaces assumptions, steelmans counter-arguments, flags blind spots and biases, gives a verdict (SOLID / SHAKY / RED FLAG), and ends with mitigations. Trigger phrases include "devil's advocate," "stress test," "what am I missing," "before I send this," and similar. |
 | [distro-agent-ticket](./distro-agent-ticket/SKILL.md) | `distro-agent-ticket` | Create or refine a Linear ticket for the `distribution-agents` automated bug-fix or enhancement workflow: guided one-question-at-a-time interview to fill canonical sections (UAC, Context, Scope, Repository, Reproduction), outcome-level refinement loop, Linear metadata selection, and final persist via MCP. Never adds the `distro-bug-agent` / `distro-enhancement-agent` trigger labels — those are applied separately when dispatching the agent. |
+| [eng-review](./eng-review/SKILL.md) | `eng-review` | **Engineering review readiness** for high-impact technical decisions: assesses a decision document against the review's requirements (clear problem statement, a real decision to be made, genuine alternatives, recommended decision, cost of being wrong, rollout plan, 2–4 page prose, stakeholders consulted, tech-lead presenter) and against six impact categories (irreversible/expensive-to-change, team blast radius, product blast radius, infra spend, new patterns, security posture), then emits a verdict and a Pass/Gap readiness checklist. Drafting helper: [decision-doc-template.md](./eng-review/references/decision-doc-template.md). Trigger: "is this ready for eng review?", "review this decision doc". |
 | [find-ticket-dependencies](./find-ticket-dependencies/SKILL.md) | `find-ticket-dependencies` | Detect and mark dependencies between a filtered set of Linear tickets: fetches tickets by project/state/label/cycle/date, gathers branch and PR signals from the repo, analyzes pairs for cross-reference, structural (shared files), and functional (API/stub/schema) dependencies, presents proposed relations for review, then writes `blocks`/`blockedBy`/`relatedTo` relations via `save_issue`. |
 | [implement-linear-ticket](./implement-linear-ticket/SKILL.md) | `implement-linear-ticket` | **End-to-end autonomous ticket implementation**: read the Linear ticket, create a feature branch, plan and implement with tests following AGENTS.md conventions, run `push-code`, open a draft PR, then poll CI and fix failures in a loop until green. Requires `push-code`. |
 | [meeting-prep](./meeting-prep/SKILL.md) | _(see skill bundle)_ | **Meeting preparation** bundle: stakeholder context, scenarios, output brief structure, and examples. Includes embedded **meeting simulation** (`simulating-meeting`) for rehearsing ("simulate the meeting", role-play attendees). |
@@ -63,6 +64,7 @@ Deeper analytical modes that inform direction or decisions.
 |-------|------|
 | [architecture-survey](./architecture-survey/SKILL.md) | Map a codebase or org structure from source code |
 | [tech-debt-assessor](./tech-debt/SKILL.md) | Prioritised tech debt assessment across repos and Linear |
+| [eng-review](./eng-review/SKILL.md) | Assess a decision document's readiness for engineering review and generate a checklist |
 | [devils-advocate](./devils-advocate/SKILL.md) | Stress-test a proposal, plan, or document |
 
 ### Reporting & Visibility
@@ -93,6 +95,7 @@ Some skills assume MCP servers, CLIs, or files outside the skill folder. Enable 
 | [address-review-comments](./address-review-comments/SKILL.md) | **GitHub CLI** (`gh`, authenticated). **`push-code` skill** must be installed (used for committing and pushing changes). No MCP. |
 | [architecture-survey](./architecture-survey/SKILL.md) | **GitHub CLI** (`gh`, authenticated to the org), **`python3`** for JSON filtering in the documented examples, and normal **git** / filesystem access to clone and inspect repos. |
 | [devils-advocate](./devils-advocate/SKILL.md) | None—works on text or documents in the session. |
+| [eng-review](./eng-review/SKILL.md) | None—assesses a decision document or draft supplied in the session. Uses [decision-doc-template.md](./eng-review/references/decision-doc-template.md) in the skill folder. No MCP. |
 | [distro-agent-ticket](./distro-agent-ticket/SKILL.md) | **Linear MCP** (`get_issue`, `list_teams`, `list_projects`, `list_cycles`, `list_issue_labels`, `save_issue`). **GitHub CLI** (`gh`, authenticated) to fetch the `allowed_repos` list from `soundcloud/distribution-agents`. |
 | [find-ticket-dependencies](./find-ticket-dependencies/SKILL.md) | **Linear MCP** — `list_issues`, `get_issue` (with `includeRelations: true`), `save_issue` (`blocks`, `blockedBy`, `relatedTo`). **GitHub CLI** (`gh`) for PR file lists and bodies. **Local git** as fallback for branch inspection. |
 | [implement-linear-ticket](./implement-linear-ticket/SKILL.md) | **Linear MCP** for reading the ticket (`get_issue`, etc.). **`push-code` skill** must be installed. **GitHub CLI** (`gh`) for creating the draft PR and polling CI run status. |
@@ -114,6 +117,9 @@ address-review-comments/SKILL.md   — PR review-comment triage, apply, push, an
 architecture-survey/SKILL.md       — Org/repo architecture methodology
 devils-advocate/SKILL.md           — Structured critique workflow
 distro-agent-ticket/SKILL.md       — Distribution-agents ticket creation/refinement
+eng-review/
+  SKILL.md                         — Eng review readiness assessment + checklist workflow
+  references/decision-doc-template.md — 2–4 page decision document structure
 find-ticket-dependencies/
   SKILL.md                         — Dependency detection and relation marking workflow
   references/dependency-patterns.md — Heuristics for cross-reference, structural, and functional signals
