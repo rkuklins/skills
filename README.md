@@ -152,7 +152,7 @@ Deploy copies each **top-level** folder that contains `SKILL.md` (nested `meetin
 
 ## Deployment
 
-Deploying copies every top-level folder that contains a `SKILL.md` into `~/.sync-skills/skills` and into the home skills folders for `claude`, `codex`, `cursor`, and `gemini`.
+Deploying copies every top-level folder that contains a `SKILL.md` into `~/.sync-skills/skills` and into the home skills folders for `claude`, `codex`, `cursor`, and `gemini`. It also mirrors the **entire repo** (minus `.git`, `node_modules`, and `.DS_Store`) into Google Drive as a single `skills` folder.
 
 Prerequisite: install Node.js with npm. The deploy script is dependency-free and does not require `sync-skills`.
 
@@ -164,7 +164,10 @@ Target folders:
 ~/.cursor/skills
 ~/.gemini/skills
 ~/.sync-skills/skills
+~/Library/CloudStorage/GoogleDrive-<account>/My Drive/skills   # full repo copy
 ```
+
+The Google Drive account defaults to `rafal.kuklinski@soundcloud.com`. Override it with the `SKILLS_GDRIVE_ACCOUNT` env var, or point at an arbitrary Drive root with `SKILLS_GDRIVE_DIR` (the repo is copied to `<dir>/skills`). If the Drive folder is not mounted, the copy is skipped with a warning. Pass `--no-gdrive` to skip it explicitly; `--common-only` also skips it.
 
 ### Windows
 
@@ -212,7 +215,7 @@ make deploy-dry-run
 
 ### Common Directory Only
 
-Copy only to `~/.sync-skills/skills` and skip assistant folders:
+Copy only to `~/.sync-skills/skills` and skip assistant folders and Google Drive:
 
 ```bash
 node scripts/deploy-skills.mjs --common-only
@@ -222,6 +225,14 @@ Or:
 
 ```bash
 make deploy-common-only
+```
+
+### Skip Google Drive
+
+Run a full deploy but skip the Google Drive mirror:
+
+```bash
+node scripts/deploy-skills.mjs --no-gdrive
 ```
 
 ## Usage
