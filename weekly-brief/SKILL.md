@@ -30,20 +30,22 @@ TODO: I WOULD LIKE TO EXTEND IT WITH ABILITY FOR ME TO ASK FOLLOW-UP QUESTIONS A
 
 Goal: for every experiment relevant to the tracked projects, report **how long it has been running, how many days are left, the hypothesis, and the primary metrics (with whether they are statistically significant)**.
 
+Note on IDs: every Statsig experiment tool below takes the experiment's Statsig `id` as `path_id` (it's the same `id` field returned by `Get_List_of_Experiments`/`Get_Experiment_Details_by_ID`, and the same value that appears as the last path segment in a `console.statsig.com/.../experiments/<id>` permalink). Capture this `id` as soon as you discover an experiment (step 3) and carry it through every later step (`Get_Experiment_Details_by_ID`, `Get_Experiment_Overall_Results`) as `path_id`.
+
 1. **Authenticate** — If a Statsig MCP tool fails with an auth/authorization error, call `mcp_auth` for the `user-statsig` server, then retry. Always read a tool's descriptor (in the MCP FileSystem) before calling it.
 2. **Build candidate experiment names/links** — Derive experiment identifiers from the evidence you already collected:
    - Scan Linear ticket titles/descriptions/comments and git commit messages + PR titles for Statsig experiment names, IDs, or `console.statsig.com` permalinks (step 7 above).
-   - Extract the experiment ID from any permalink (the segment after `/experiments/`).
+   - Extract the experiment ID from any permalink (the segment after `/experiments/`) — this is the `path_id` you'll reuse in steps 4 and 6.
 3. **Discover experiments** — Fetch the candidate set with the Statsig MCP:
    - If you have specific IDs, call `Get_List_of_Experiments` with `query_ids` (batches of ≤100) to read them in one request.
-   - Otherwise call `Get_List_of_Experiments` filtered by `query_status` (include at least `active`, `setup`, and recently `decision_made`/`experiment_stopped`) and, if the team's Statsig `teamID` is known, `query_teamID`. Use `query_fields` like `["name","status","hypothesis","primaryMetrics","groups","startTime","permalink"]` to keep responses small.
-   - Match discovered experiments back to the projects by name/keyword overlap. Only include experiments that plausibly belong to the tracked team/projects; note the matching evidence (which ticket/commit referenced it).
-4. **Get details per experiment** — For each matched experiment call `Get_Experiment_Details_by_ID` (or reuse the list response) to read: `hypothesis`, `primaryMetrics`, `groups` (control/test names), `status`, `startTime`, and target duration/end date if present. Capture the `permalink` for the report link.
+   - Otherwise call `Get_List_of_Experiments` filtered by `query_status` (include at least `active`, `setup`, and recently `decision_made`/`experiment_stopped`) and, if the team's Statsig `teamID` is known, `query_teamID`. Include `"id"` in `query_fields` (e.g. `["id","name","status","hypothesis","primaryMetrics","groups","startTime","permalink"]`) to keep responses small while still capturing the identifier you'll need later.
+   - Match discovered experiments back to the projects by name/keyword overlap. Only include experiments that plausibly belong to the tracked team/projects; note the matching evidence (which ticket/commit referenced it). For each match, record its `id` — this is the `path_id` used in steps 4 and 6.
+4. **Get details per experiment** — For each matched experiment, call `Get_Experiment_Details_by_ID` with `path_id` set to the experiment's `id` from step 2/3 (or reuse the list response if it already has everything) to read: `hypothesis`, `primaryMetrics`, `groups` (control/test group names), `status`, `startTime`, and target duration/end date if present. Capture the `permalink` for the report link.
 5. **Compute timing**:
    - **Days running** = today − `startTime` (only for experiments that have started).
    - **Days left** = target end date − today, or (`startTime` + target duration) − today. If no target duration is set, state "no target end date set".
    - For `setup`/planned experiments that have not started, report the scheduled start instead of days running.
-6. **Get results & significance** — For started experiments, call `Get_Experiment_Overall_Results` with `path_id` and the control/test group names from `groups`. For each **primary** metric report the lift/direction and whether it is **statistically significant** (based on the significance/confidence flag in the results). If results are not yet available (too early / insufficient exposure), say so explicitly.
+6. **Get results & significance** — For started experiments, call `Get_Experiment_Overall_Results` with `path_id` set to the same experiment `id` used in step 4, plus `query_control` and `query_test` set to the control/test group names from `groups` (step 4). For each **primary** metric report the lift/direction and whether it is **statistically significant** (based on the significance/confidence flag in the results). If results are not yet available (too early / insufficient exposure), say so explicitly.
 7. If an experiment referenced in Linear/git cannot be found in Statsig, list it as "referenced but not found in Statsig" so the gap is visible.
 
 ## Output Template
