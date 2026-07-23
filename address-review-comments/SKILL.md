@@ -3,7 +3,7 @@ name: address-review-comments
 description: Fetch PR review comments, recommend actions, apply approved changes, push, and reply to each comment
 allowed-tools: Read, Edit, Write, Bash(git:*), Bash(gh:*)
 metadata:
-    version: 1.0.0
+    version: 1.1.0
 ---
 
 # address-review-comments
@@ -37,9 +37,11 @@ For each comment, think carefully and deeply:
 - Read the relevant code in the file at the referenced line(s).
 - Understand what the reviewer is asking for or suggesting.
 - Evaluate whether the suggestion is correct, beneficial, and aligned with the codebase conventions.
-- Decide on one of two recommendations:
+- Check whether the concern is already covered by an existing tracked ticket (Linear, Jira, GitHub issue, etc.) — search for it (e.g. via the Linear MCP or `gh issue list`) rather than assuming. This matters even when the comment is valid: a correct suggestion can still be out of scope for the current PR.
+- Decide on one of three recommendations:
   - **(a) Make a change** — describe the specific change you would make and why it addresses the comment.
   - **(b) No change needed** — provide a clear explanation and rationale for why the code should stay as-is.
+  - **(c) Already tracked elsewhere** — the concern is valid but belongs to a different, already-existing ticket (or is a pre-existing issue predating this PR, not a regression it introduces). No code change in this PR. Cite the specific tracking ticket by ID/link as the rationale.
 
 ### 4. Present recommendations to the user
 
@@ -47,7 +49,7 @@ Present all comments and your recommendations in a clear, structured format:
 
 For each comment:
 - Show the reviewer name, file, line(s), and the comment text (quoted).
-- Show your recommendation (change or no-change) with rationale.
+- Show your recommendation ((a) change, (b) no-change, or (c) already tracked) with rationale, including the tracking ticket link for (c).
 
 Then ask the user to review. The user can:
 - **Confirm** all recommendations as-is.
@@ -75,14 +77,19 @@ Make all changes carefully, following the coding and testing conventions describ
 
 ### 7. Reply to each comment on the PR
 
+This step is mandatory and always runs for every comment that reached a decision — never leave a comment's outcome implicit or silently drop a reply just because no code changed. Every reply must state the decision explicitly (as resolved/done) and give the rationale for it — a reply that only says "makes sense" or "will not fix" without the reasoning is not sufficient.
+
 For each comment that was NOT ignored by the user:
 
-- If a code change was made: reply explaining what was changed and why, referencing the commit if helpful.
-- If no change was made: reply with the rationale for keeping the code as-is.
+- **(a) Change made**: reply explaining what was changed and why, referencing the commit if helpful.
+- **(b) No change needed**: reply stating the decision (no change) and the rationale for keeping the code as-is.
+- **(c) Already tracked elsewhere**: reply stating the decision plainly (e.g. "Resolved — tracked by `<TICKET-ID>`: `<link>`") plus the rationale for why it's handled there instead of in this PR.
 
 Post replies using `gh api repos/{owner}/{repo}/pulls/{number}/comments -f body="..." -F in_reply_to={comment_id}` for inline comments (note: `-F` for `in_reply_to` so it is sent as a number, not a string — the GitHub API rejects string values for this field), or `gh api repos/{owner}/{repo}/issues/{number}/comments -f body="..."` for general review comments.
 
 Keep replies concise, respectful, and constructive.
+
+If two or more comments in this pass resolve to the same tracking ticket or the same underlying decision, also post one top-level PR summary comment (via `gh api repos/{owner}/{repo}/issues/{number}/comments`) tying them together, in addition to the individual inline replies — don't make reviewers piece it together from separate threads.
 
 ### 8. Resolve addressed comment threads
 
